@@ -1,10 +1,9 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const dbConnection = require("./config/dbConfig");
+const connectDB = require('./config/db');
 const cors = require("cors");
 const Tender = require("./models/Tender");
-const mongoose = require("mongoose");
 const Contract = require("./models/Contract");
 const payment = require("./models/Payment");
 const Issue = require("./models/Issue");
@@ -18,11 +17,8 @@ const HOST = "0.0.0.0";
 app.use(bodyParser.json());
 app.use(cors());
 
-const uri = process.env.MONGODB_URI;
-mongoose
-  .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((error) => console.error("Error connecting to MongoDB:", error));
+const dbName = 'contracts';
+connectDB(dbName);
 
 app.get("/tenders", async (req, res) => {
   try {
@@ -68,7 +64,7 @@ app.put("/payments", async (req, res) => {
     const { id, status } = req.body;
     console.log("status", status);
     console.log("id", id);
-    const booleanStatus = status === "true" || status === true; // Convert status to boolean
+    const booleanStatus = status === "true" || status === true; 
     const updatedPayment = await payment.findByIdAndUpdate(
       id,
       { status: booleanStatus },
@@ -115,7 +111,6 @@ await IssueChain.createIssue({
 }).catch((error) => {
     console.log("Error adding issue in ConTrack Network:", error);
     return res.status(500).json({ error: error.message });
-    console.error("Error creating issue:", error);
 });
 
 
