@@ -3,9 +3,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const connectDB = require('./config/db');
 const cors = require("cors");
-const payment = require("./models/Payment");
 const Issue = require("./models/Issue");
-const UserIssue = require("./models/UserIssue");
 const Counter = require("./models/Counter"); 
 const IssueChain = require("./tests/issueFunctions");
 
@@ -15,6 +13,9 @@ const addContract = require("./routes/addContract");
 const updateContract = require("./routes/updateContract");
 const getVotes = require("./routes/getVotes");
 const getContractById = require("./routes/getContractById");
+const getIssue = require("./routes/getIssues");
+const getVoteStatus = require("./routes/get-voteStatus");
+const vote = require("./routes/vote");
 
 const PORT = process.env.PORT || 4000; 
 const HOST = "0.0.0.0";
@@ -31,16 +32,9 @@ app.use("/addContract", addContract);
 app.use("/updateContract", updateContract);
 app.use("/", getVotes);
 app.use("/", getContractById);
-
-app.post("/govcontract", async (req, res) => {
-  try { 
-    const govContract = new payment(req.body);
-    await govContract.save();
-    res.status(201).json(govContract);
-  } catch (error) { 
-    res.status(500).json({ message: error.message });
-  }
-});
+app.use("/issues", getIssue);
+app.use("/", getVoteStatus);
+app.use("/vote", vote);
 
 app.post("/issues", async (req, res) => {
   try {
@@ -84,72 +78,6 @@ await IssueChain.createIssue({
   }
 });
  
-app.get("/issues", async (req, res) => {
-  try {
-    console.log("GET /issues");
-
-    const issues = await Issue.find();
-    console.log(issues);
-    return res.status(200).json(issues);
-  } catch (error) {
-    console.error("Error fetching issues:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/vote", async (req, res) => {
-  try {
-    const { issueId, userId, voteType } = req.body;
-    console.log("POST /vote", { issueId, userId, voteType });
-
-    const issue = await Issue.findOne({ id: issueId });
-    if (!issue) {
-      return res.status(404).json({ error: "Issue not found" });
-    }
-    console.log(issue.approval);
-
-    const update = {};
-    if (voteType === "approve") {
-      update.approval = issue.approval + 1;
-    } else if (voteType === "deny") {
-      update.denial = issue.denial + 1;
-    } else {
-      return res.status(400).json({ error: "Invalid vote type" });
-    }
-
-    await Issue.updateOne({ id: issueId }, update);
-    console.log("Updated issue:", update);
-
-    const temp = Issue.find();
-
-    await UserIssue.collection.insertOne({ userId, issueId, voted: voteType });
-
-    return res.status(200).json({ message: "Vote recorded successfully" });
-  } catch (error) {
-    console.error("Error submitting vote:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get("/vote-status", async (req, res) => {
-  try {
-    const { userId, issueId } = req.query;
-    console.log("GET /vote-status", { userId, issueId });
-
-    // Find the user-issue mapping
-    const userIssue = await UserIssue.findOne({ userId, issueId });
-    console.log(userIssue.voted);
-    if (!userIssue.voted) {
-      return res.status(200).json({ voted: null });
-    }
-
-    return res.status(200).json({ voted: userIssue.voted });
-  } catch (error) {
-    console.error("Error fetching vote status:", error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
 app.use("/*", (req, res) => {
   res.status(404).json({ message: "Endpoint not found" });
 });
