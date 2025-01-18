@@ -3,15 +3,17 @@ const app = express();
 const bodyParser = require("body-parser");
 const connectDB = require('./config/db');
 const cors = require("cors");
-const Tender = require("./models/Tender");
 const Contract = require("./models/Contract");
+const Tender = require("./models/Tender");
 const payment = require("./models/Payment");
 const Issue = require("./models/Issue");
 const UserIssue = require("./models/UserIssue");
 const Counter = require("./models/Counter"); 
 const IssueChain = require("./tests/issueFunctions");
 
-const PORT = process.env.PORT || 4000;
+const getTender = require("./routes/tenders"); 
+
+const PORT = process.env.PORT || 4000; 
 const HOST = "0.0.0.0";
 
 app.use(bodyParser.json());
@@ -20,22 +22,14 @@ app.use(cors());
 const dbName = 'contracts';
 connectDB(dbName);
 
-app.get("/tenders", async (req, res) => {
-  try {
-    const tenders = await Tender.find();
-    console.log(tenders);
-    res.json(tenders);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+app.use("/tenders", getTender);
 
 app.post("/govcontract", async (req, res) => {
-  try {
+  try { 
     const govContract = new payment(req.body);
     await govContract.save();
     res.status(201).json(govContract);
-  } catch (error) {
+  } catch (error) { 
     res.status(500).json({ message: error.message });
   }
 });
@@ -50,14 +44,14 @@ app.get("/govcontract/:referenceId", async (req, res) => {
   }
 });
 
-app.get("/contracts", async (req, res) => {
-  try {
-    const contracts = await Contract.find();
-    res.json(contracts);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// app.get("/contracts", async (req, res) => {
+//   try {
+//     const contracts = await Contract.find();
+//     res.json(contracts);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 app.put("/payments", async (req, res) => {
   try {
@@ -112,10 +106,6 @@ await IssueChain.createIssue({
     console.log("Error adding issue in ConTrack Network:", error);
     return res.status(500).json({ error: error.message });
 });
-
-
-
-
     return res
       .status(201)
       .json({ message: "Issue created successfully", issue: newIssue });
@@ -195,6 +185,102 @@ app.get("/vote-status", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+
+app.get("/getVotes/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("GET /issue-votes", { id });
+
+    const issue = await Issue.findOne({ id });
+    if (!issue) {
+      return res.status(404).json({ error: "Issue not found" });
+    }
+
+    return res.status(200).json({
+      issueId: issue.id,
+      approval: issue.approval,
+      denial: issue.denial,
+    });
+  } catch (error) {
+    console.error("Error fetching issue votes:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/updateContract", async (req, res) => {
+  try {
+    const { contractorId, referenceId, bidAmount, amountUsed, selectedOption, paymentMade, status } = req.body;
+
+    if (!contractorId || !referenceId) {
+      return res.status(400).json({ error: "contractorId and referenceId are required" });
+    }
+
+    const existingContract = await Contract.findOne({ referenceId });
+    if (!existingContract) {
+      return res.status(404).json({ error: "Contract with this referenceId not found" });
+    }
+
+    if (existingContract.contractorId !== contractorId) {
+      return res.status(403).json({ error: "Invalid contractorId for this referenceId" });
+    }
+
+    const newPayment = new payment({
+      referenceId,
+      contractorId,
+      bidAmount: bidAmount || existingContract.bidAmount,
+      amountUsed: amountUsed,
+      selectedOption: selectedOption,
+      paymentMade: paymentMade, 
+      status: status, 
+    });
+
+    await newPayment.save();
+
+    return res.status(201).json({
+      message: "Payment created successfully for the contract",
+      payment: newPayment,
+    });
+  } catch (error) {
+    console.error("Error updating contract:", error);
+    res.status(500).json({ error: "Failed to create payment for the contract" });
+  }
+});
+
+
+app.post("/addContract", async (req, res) => {
+  try {
+    const { contractorId, organisationChain, referenceId, bidAmount, panelid } = req.body;
+
+    if (!contractorId || !organisationChain || !referenceId || !bidAmount || !panelid) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    const existingContract = await Contract.findOne({ referenceId });
+    if (existingContract) {
+      return res.status(400).json({ error: "Contract with this referenceId already exists" });
+    }
+
+    const newContract = new Contract({
+      contractorId,
+      organisationChain,
+      referenceId,
+      bidAmount,
+      panelid,
+    });
+
+    await newContract.save();
+
+    return res.status(201).json({
+      message: "Contract added successfully",
+      contract: newContract,
+    });
+  } catch (error) {
+    console.error("Error adding contract:", error);
+    res.status(500).json({ error: "Failed to add contract" });
+  }
+});
+
 
 app.use("/*", (req, res) => {
   res.status(404).json({ message: "Endpoint not found" });

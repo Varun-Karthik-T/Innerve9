@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const paymentSchema = new mongoose.Schema({
     referenceId: String,
+    contractorId: String,
     bidAmount: Number,
     amountUsed: Number,
     selectedOption: String,
