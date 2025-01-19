@@ -37,6 +37,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "25df31ae-13c6-412d-bc05-105ab40447cf"
+      }
+    },
+    "owner": "varun-karthik-t"
   }
 }
