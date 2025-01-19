@@ -74,12 +74,11 @@ const PeopleHome = () => {
       />
       <FAB
         style={styles.fab}
-        icon="exclamation-thick"
-        size="small"
+        icon="plus"
+        size="medium"
         mode="elevated"
-        variant="tertiary"
         onPress={() => router.push("/peopleIssue")}
-        label="Report a new issue"
+        label="Add a new issue"
       />
     </Surface>
   );
