@@ -30,10 +30,10 @@ app.use("/addContract", addContract);
 app.use("/updateContract", updateContract);
 app.use("/", getVotes);
 app.use("/", getContractById);
-app.use("/issues", getIssue);       //getIssue
+app.use("/issues", getIssue);      
 app.use("/", getVoteStatus);
-app.use("/vote", vote);             //addVote
-app.use("/issues", addIssue);       //addIssue 
+app.use("/vote", vote);             
+app.use("/issues", addIssue);      
  
 app.use("/*", (req, res) => {
   res.status(404).json({ message: "Endpoint not found" });

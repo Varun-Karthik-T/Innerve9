@@ -6,13 +6,12 @@ console.log("ISSUE_CONTRACT_ADDRESS:", process.env.ISSUE_CONTRACT_ADDRESS);
 const Web3 = require("web3");
 const fs = require("fs");
 
-// Replace with your RPC URL
 const rpcUrl =
 process.env.RPC_URL;
 const privateKey = process.env.PRIVATE_KEY;
 const contractAddress = process.env.ISSUE_CONTRACT_ADDRESS;
 
-// Contract ABI (load it dynamically or define it directly)
+
 const contractAbi = JSON.parse(
   fs.readFileSync("../Blockchain/build/contracts/IssueManager.json")
 ).abi;
@@ -29,9 +28,9 @@ const contract = new web3.eth.Contract(contractAbi, contractAddress);
 
 console.log("Connected account:", account.address);
 
-// Function to add an issue
+
 async function addIssue(issue) {
-  const scaledLatitude = Math.round(issue.latitude * 10000); // multiply by 10000
+  const scaledLatitude = Math.round(issue.latitude * 10000); 
   const scaledLongitude = Math.round(issue.longitude * 10000);
   try {
     const receipt = await contract.methods
@@ -74,21 +73,4 @@ async function getIssue(issueId) {
   }
 }
 
-// Example usage
-(async () => {
-  console.log("Starting interaction with the IssueManager contract...");
-
-  // Add an issue
-  await addIssue({
-    id: "1",
-    issue_type: "Road",
-    description: "Pothole near my house",
-    date_of_complaint: "2025-01-19",
-    status: "Pending",
-    latitude: 12.971598,
-    longitude: 77.594566,
-  });
-
-  // Retrieve an issue
-  await getIssue("1");
-})();
+module.exports = { addIssue, getIssue };
