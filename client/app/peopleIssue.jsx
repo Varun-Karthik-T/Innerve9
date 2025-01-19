@@ -11,7 +11,7 @@ const PeopleIssue = () => {
   const [issueType, setIssueType] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState('');
-  const [location, setLocation] = useState<Location.LocationObjectCoords | null>(null);
+  const [location, setLocation] = useState(null);
   const [dateOfComplaint, setDateOfComplaint] = useState(new Date().toISOString().split('T')[0]);
 
   const handleCaptureImage = async () => {
@@ -26,11 +26,11 @@ const PeopleIssue = () => {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
-      base64: true, // Add this line to get the Base64 string
+      base64: true,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
-      setImage(result.assets[0].base64); // Store the Base64 string
+      setImage(result.assets[0].base64);
     }
   };
 
@@ -109,35 +109,35 @@ const PeopleIssue = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    padding: 20, // Increase padding
+    padding: 20,
     backgroundColor: '#f5f5f5',
   },
   card: {
-    padding: 20, // Increase padding
-    marginVertical: 10, // Add margin
+    padding: 20,
+    marginVertical: 10,
   },
   label: {
-    fontSize: 18, // Increase font size
+    fontSize: 18,
     marginVertical: 8,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 10, // Increase padding
+    padding: 10,
     marginVertical: 8,
     borderRadius: 4,
-    fontSize: 16, // Increase font size
+    fontSize: 16,
   },
   image: {
     width: '100%',
     height: 200,
     marginVertical: 8,
-    borderRadius: 8, // Add border radius
+    borderRadius: 8,
   },
   buttonContainer: {
-    marginTop: 16, // Add space between buttons
-    borderRadius: 8, // Curve the boundaries of the buttons
-    overflow: 'hidden', // Ensure the border radius is applied
+    marginTop: 16,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
 });
 
