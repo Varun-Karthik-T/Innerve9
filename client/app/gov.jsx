@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import { BottomNavigation, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useLayoutEffect } from 'react';
@@ -7,11 +7,11 @@ import  Page1  from '../components/gov/page1';
 import Page3  from '../components/gov/page3';
 
 
-const IssueRoute = () => <Page1></Page1>;
+const IssueRoute = () => <Page1 />;
 
-const ContractRoute = () => <Page2></Page2>;
+const ContractRoute = () => <Page2 />;
 
-const TenderRoute = () => <Page3></Page3>;
+const TenderRoute = () => <Page3 />;
 
 const ContractBottom = () => {
   const navigation = useNavigation();
@@ -22,8 +22,8 @@ const ContractBottom = () => {
     });
   }, [navigation]);
 
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
+  const [index, setIndex] = useState(0);
+  const [routes] = useState([
     { key: 'Issue', title: 'Issues', focusedIcon: 'alert-circle', unfocusedIcon: 'alert-circle-outline' },
     {key: 'Tender', title: 'Tender', focusedIcon: 'file-document-multiple'},
     { key: 'Contract', title: 'Contract', focusedIcon: 'file-sign' },

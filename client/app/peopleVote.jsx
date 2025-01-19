@@ -46,7 +46,7 @@ const PeopleVote = () => {
 
   const handleVote = async (voteType) => {
     try {
-      const response = await api.post("4000/vote", {
+      const response = await api.post("/vote", {
         issueId: String(parsedIssue.id),
         userId: "1",
         voteType,

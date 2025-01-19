@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Image } from 'react-native';
-import { Card } from 'react-native-paper';
+import { View, StyleSheet, ScrollView, Image } from 'react-native';
+import { Card,Text, TextInput, Button } from 'react-native-paper';
 import { useLocalSearchParams } from 'expo-router';
 
 export default function MakeTender() {
@@ -113,7 +113,7 @@ export default function MakeTender() {
         </Card.Content>
       </Card>
 
-      <Button title="Submit Tender" onPress={handleSubmit} color="#008080" /> {/* Teal color */}
+      <Button onPress={handleSubmit}> Submit Tender </Button>
     </ScrollView>
   );
 }

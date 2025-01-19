@@ -8,8 +8,9 @@ import {
   Surface
 } from "react-native-paper";
 import { useRouter } from "expo-router";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, Image } from "react-native";
 import { useState } from "react";
+import logo from "@/assets/images/Logo.png"
 
 const LoginPortals = () => {
   const [role, setRole] = useState(0);
@@ -27,7 +28,7 @@ const LoginPortals = () => {
     },
     {
       title: "Government",
-      route: "/gov",
+      route: "gov",
       icon: "city",
     },
   ];
@@ -52,6 +53,7 @@ const LoginPortals = () => {
         </Text>
       </View>
       <Divider style={{ width: "90%" }} bold={true} />
+      <Image source={logo} style={{width: 200, height: 200, marginVertical: 12}} />
       <View style={styles.cardHolder}>
         <IconButton
           icon="chevron-left"
@@ -107,8 +109,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    margin: 12,
-    marginVertical: 24,
   },
   card: {
     width: 200,
